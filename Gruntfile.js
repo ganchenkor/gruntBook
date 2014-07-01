@@ -79,7 +79,7 @@ module.exports = function(grunt) {
 
 		html2js: {
 			app: {
-				optoins: {
+				options: {
 					base: 'src/app'
 				},
 				src: ['<%= app_files.atpl %>'],
