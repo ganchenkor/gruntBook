@@ -4,6 +4,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-concurrent');
+	grunt.loadNpmTasks('grunt-html2js');
 
 	var userConfig = require('./build.config.js');
 
@@ -17,7 +18,7 @@ module.exports = function(grunt) {
 			appjs: {
 				files: [
 					{
-						src:[ '<%= app_files.js %>'],
+						src:[ '<%= app_files.js %>', '<%= vendor_files.js %>'],
 						dest: '<%= build_dir %>',
 						cwd: '.',
 						expand: true
@@ -31,7 +32,8 @@ module.exports = function(grunt) {
 				dir: '<%= build_dir %>',
 				src: [
 					'<%= vendor_files.js %>',
-					'<%= build_dir %>/src/**/*.js'
+					'<%= build_dir %>/src/**/*.js',
+					'<%= html2js.app.dest %>'
 				]
 			}
 		},
@@ -41,7 +43,7 @@ module.exports = function(grunt) {
 			files: [
 			'<%= app_files.js %>'
 			],
-			tasks: []
+			tasks: ['copy', 'index']
 			},
 			html: {
 				files: 
@@ -68,16 +70,26 @@ module.exports = function(grunt) {
 		},
 		concurrent: {
 			dev: {
-				tasks: ['nodemon'],
+				tasks: ['nodemon', 'watch'],
 				options: {
 					logConcurrentOutput: true
 				}
+			}
+		},
+
+		html2js: {
+			app: {
+				optoins: {
+					base: 'src/app'
+				},
+				src: ['<%= app_files.atpl %>'],
+				dest: '<%= build_dir %>/templates-app.js'
 			}
 		}
 	};
 	grunt.initConfig(grunt.util._.extend(taskConfig, userConfig));
 	grunt.registerTask('default', ['build', 'concurrent']);
-	grunt.registerTask('build', ['clean', 'copy', 'index'])
+	grunt.registerTask('build', ['clean', 'copy', 'html2js', 'index' ])
 
 		function filterForJS(files) {
 			return files.filter(function (file) {
